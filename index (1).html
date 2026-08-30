@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>태명당 — 이름 하나에 담는, 평생의 첫 축복</title>
+<meta name="description" content="부모 성함만 입력하면 의미와 축복 메시지까지 담긴 태명을 무료로 지어드립니다." />
+<style>
+  :root{
+    --gold:#B08D57; --gold-bright:#D4AF6A; --ink:#0D0E10; --panel:#17181B;
+    --hairline:#2B2C30; --text-main:#EDEAE2; --text-mute:#8A8A85; --seal:#8C2F2F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:radial-gradient(ellipse at top, #16171a 0%, var(--ink) 55%);
+    color:var(--text-main); font-family:'Noto Sans KR', sans-serif; min-height:100vh;
+  }
+  .serif{font-family:'Noto Serif KR','Georgia',serif;}
+  .wrap{max-width:640px; margin:0 auto; padding:0 24px 80px;}
+  header{text-align:center; padding-top:64px; padding-bottom:32px;}
+  .eyebrow-row{display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:20px;}
+  .eyebrow-row .line{height:1px; width:32px; background:var(--gold);}
+  .eyebrow-row p{font-size:12px; letter-spacing:0.35em; text-transform:uppercase; font-weight:700; color:var(--gold); margin:0;}
+  h1{font-size:64px; font-weight:900; margin:0; text-shadow:0 0 40px rgba(176,141,87,0.25);}
+  header p.tagline{font-size:16px; margin-top:16px; font-weight:500; color:var(--text-mute);}
+  .diamond-row{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:32px;}
+  .diamond-row .line{height:1px; width:64px; background:var(--hairline);}
+  .diamond-row .dot{width:6px; height:6px; background:var(--gold); transform:rotate(45deg);}
+  .trust{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding-bottom:16px;}
+  .trust > div{text-align:center; padding:16px 4px; border-top:1px solid var(--hairline);}
+  .trust svg{stroke:var(--gold); margin-bottom:8px;}
+  .trust p{font-size:11px; font-weight:700; color:var(--text-mute); margin:0; line-height:1.3;}
+  form-section{display:block;}
+  .field{margin-bottom:24px;}
+  .field label{display:block; font-size:12px; letter-spacing:0.15em; text-transform:uppercase; font-weight:700; color:var(--text-mute); margin-bottom:8px;}
+  .field input[type=text], .field input[type=date]{
+    width:100%; background:transparent; border:none; border-bottom:1px solid var(--hairline);
+    color:var(--text-main); font-size:18px; padding:8px 0; font-family:inherit;
+  }
+  .field input:focus{outline:none; border-bottom-color:var(--gold);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .gender-btns{display:flex; gap:24px; margin-top:8px;}
+  .gender-btns button{
+    background:none; border:none; font-size:16px; font-weight:700; padding-bottom:4px;
+    color:var(--text-mute); border-bottom:1px solid transparent; cursor:pointer; font-family:inherit;
+  }
+  .gender-btns button.active{color:var(--gold); border-bottom-color:var(--gold);}
+  .cta{
+    width:100%; padding:20px; font-size:14px; letter-spacing:0.2em; text-transform:uppercase;
+    font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    background:linear-gradient(135deg, var(--gold-bright), var(--gold)); color:var(--ink); border-radius:2px;
+    margin-top:8px;
+  }
+  .cta:disabled{opacity:0.6; cursor:default;}
+  .error-text{color:#C0705A; font-size:14px;}
+  .results{margin-top:32px;}
+  .results .label{font-size:12px; letter-spacing:0.15em; text-transform:uppercase; font-weight:700; color:var(--text-mute); margin-bottom:12px;}
+  .card{background:var(--panel); border:1px solid var(--hairline); padding:24px; margin-bottom:16px; opacity:0; animation:fadeUp .5s ease forwards;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .card-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .card-top .name{font-size:30px; font-weight:700;}
+  .seal-badge{width:32px; height:32px; border:1.5px solid var(--seal); color:var(--seal); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transform:rotate(-8deg); flex-shrink:0;}
+  .card .meaning{font-size:14px; color:var(--text-mute); margin:0 0 8px;}
+  .card .blessing{font-size:14px; font-style:italic; color:var(--gold-bright); margin:0 0 16px;}
+  .card button.save-btn{
+    background:none; border:none; color:var(--gold); font-size:12px; letter-spacing:0.15em;
+    text-transform:uppercase; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; padding:0; font-family:inherit;
+  }
+  .unlock-btn{
+    width:100%; padding:20px; font-size:13px; letter-spacing:0.2em; text-transform:uppercase; font-weight:900;
+    background:linear-gradient(135deg, #8C6A2E, var(--gold-bright), #8C6A2E);
+    background-size:200% auto; border:1px solid var(--gold-bright); color:#0D0E10; cursor:pointer;
+    margin-top:4px; font-family:inherit; position:relative; animation:shimmer 3s linear infinite;
+    box-shadow:0 0 24px rgba(212,175,106,0.35);
+  }
+  @keyframes shimmer{0%{background-position:0% center;} 100%{background-position:200% center;}}
+  .unlock-sub{text-align:center; font-size:12px; color:var(--gold); margin:0 0 10px; font-weight:700; letter-spacing:0.05em;}
+  .teaser-card{
+    background:var(--panel); border:1px dashed var(--hairline); padding:20px; margin-bottom:12px;
+    filter:blur(3px); opacity:0.5; pointer-events:none; position:relative;
+  }
+  .teaser-card .name{font-size:26px; font-weight:700; color:var(--text-mute);}
+  .teaser-wrap{position:relative; margin-bottom:16px;}
+  .teaser-lock{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; color:var(--gold-bright); font-size:13px; font-weight:900; letter-spacing:0.05em;
+  }
+  .modal{position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px; background:rgba(0,0,0,0.85);}
+  .modal.show{display:flex;}
+  .modal p{font-size:14px; font-weight:700; text-align:center; margin:0 0 4px;}
+  .modal .hint{font-size:12px; color:var(--gold); margin-bottom:16px;}
+  .modal img{max-width:100%; max-height:65vh; border:1px solid var(--hairline); border-radius:4px;}
+  .modal button{margin-top:24px; padding:12px 24px; font-size:12px; letter-spacing:0.2em; text-transform:uppercase;
+    font-weight:700; background:none; border:1px solid var(--gold); color:var(--gold); cursor:pointer; font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow-row"><div class="line"></div><p>Since Your Child's First Gift</p><div class="line"></div></div>
+    <h1 class="serif">태명당</h1>
+    <p class="tagline">이름 하나에 담는, 평생의 첫 축복</p>
+    <div class="diamond-row"><div class="line"></div><div class="dot"></div><div class="line"></div></div>
+  </header>
+
+  <div class="trust">
+    <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>정성껏 고른 태명</p></div>
+    <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 12a8 8 0 1 1-16 0"/><path d="M12 2v2"/></svg><p>정성으로 짓는 이름</p></div>
+    <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg><p>바로 소장하는 증서</p></div>
+  </div>
+
+  <section>
+    <div class="row2">
+      <div class="field"><label>아빠 성</label><input type="text" id="dadSurname" placeholder="예: 김" /></div>
+      <div class="field"><label>엄마 성</label><input type="text" id="momSurname" placeholder="예: 이" /></div>
+    </div>
+    <div class="field">
+      <label>아기 성별</label>
+      <div class="gender-btns" id="genderBtns">
+        <button data-g="아들">아들</button>
+        <button data-g="딸">딸</button>
+        <button data-g="모름" class="active">모름</button>
+      </div>
+    </div>
+    <div class="field"><label>출산 예정일 (선택)</label><input type="date" id="dueDate" /></div>
+    <p class="error-text" id="errorText" style="display:none;"></p>
+    <button class="cta" id="generateBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/></svg>
+      <span id="btnLabel">태명 받아보기</span>
+    </button>
+  </section>
+
+  <section class="results" id="resultsSection" style="display:none;">
+    <p class="label" id="resultsLabel"></p>
+    <div id="cardsContainer"></div>
+    <div id="teaserWrap" class="teaser-wrap" style="display:none;"></div>
+    <p class="unlock-sub" id="unlockSub" style="display:none;">✦ 상위 1%만 받는 특별한 태명 ✦</p>
+    <button class="unlock-btn" id="unlockBtn">VIP 태명 전체 공개하기 · 9,900원</button>
+  </section>
+</div>
+
+<div class="modal" id="modal">
+  <p>이미지를 길게 눌러(또는 우클릭) "이미지 저장"을 선택하세요</p>
+  <p class="hint">인스타 스토리나 카톡 프로필에 올려 가족·친구들에게 태명을 자랑해보세요 🎉</p>
+  <img id="modalImg" src="" alt="태명 증서" />
+  <button id="closeModal">닫기</button>
+</div>
+
+<canvas id="hiddenCanvas" style="display:none;"></canvas>
+
+<script>
+const GOLD="#B08D57", GOLD_BRIGHT="#D4AF6A", INK="#0D0E10", PANEL="#17181B", HAIRLINE="#2B2C30", TEXT_MAIN="#EDEAE2", TEXT_MUTE="#8A8A85", SEAL_RED="#8C2F2F";
+
+const NAME_BANK = [
+  {name:"튼튼이",tag:"공용",meaning:"건강하고 튼튼하게 자라길 바라는 마음을 담은 태명",blessing:"세상 무엇에도 흔들리지 않는 튼튼한 몸과 마음으로 자라나렴."},
+  {name:"복덩이",tag:"공용",meaning:"집안에 복을 불러오는 귀한 존재라는 뜻",blessing:"네가 오는 것만으로 이미 우리 가족에게는 큰 복이란다."},
+  {name:"해피",tag:"공용",meaning:"행복을 뜻하는 순우리말 감성의 태명",blessing:"평생 웃음이 끊이지 않는 행복한 사람으로 자라나렴."},
+  {name:"다복이",tag:"공용",meaning:"복이 많다는 뜻의 정겨운 태명",blessing:"가는 곳마다 좋은 인연과 복이 함께하길."},
+  {name:"새봄이",tag:"공용",meaning:"새로운 계절처럼 생명력 넘치는 시작을 의미",blessing:"매일이 새봄처럼 설레고 싱그러운 삶이 되길."},
+  {name:"하늘이",tag:"공용",meaning:"넓고 큰 뜻을 품으라는 의미",blessing:"하늘처럼 넓은 마음으로 세상을 품는 사람이 되렴."},
+  {name:"온유",tag:"공용",meaning:"따뜻하고 부드러운 성품을 바라는 태명",blessing:"누구에게나 따뜻함을 나눠주는 온유한 사람이 되길."},
+  {name:"다온이",tag:"공용",meaning:"좋은 것만 다 온다는 뜻의 순우리말",blessing:"네 삶에 좋은 일만 가득 다가오길 바란다."},
+  {name:"이든이",tag:"공용",meaning:"히브리어로 에덴, 축복의 동산을 의미",blessing:"네가 있는 곳이 언제나 축복의 동산이 되길."},
+  {name:"라온이",tag:"공용",meaning:"즐거운, 기쁜을 뜻하는 순우리말",blessing:"매 순간을 즐거움으로 채우며 살아가렴."},
+  {name:"곰돌이",tag:"아들",meaning:"듬직하고 씩씩한 기운을 담은 태명",blessing:"곰처럼 든든하고 씩씩한 사람으로 자라나렴."},
+  {name:"장군이",tag:"아들",meaning:"용맹하고 리더십 있는 기상을 바라는 태명",blessing:"어디서든 앞장서는 용기 있는 사람이 되길."},
+  {name:"우람이",tag:"아들",meaning:"크고 튼튼하게 자라길 바라는 마음",blessing:"몸도 마음도 우람하고 단단하게 자라나렴."},
+  {name:"씩씩이",tag:"아들",meaning:"밝고 용기있는 성격을 바라는 태명",blessing:"어떤 어려움 앞에서도 씩씩하게 헤쳐나가렴."},
+  {name:"든든이",tag:"아들",meaning:"가족의 든든한 버팀목이 되길 바라는 태명",blessing:"가족과 주변 사람들의 든든한 힘이 되어주렴."},
+  {name:"용감이",tag:"아들",meaning:"용기 있는 삶을 바라는 태명",blessing:"두려움 앞에서도 물러서지 않는 용기를 갖길."},
+  {name:"푸른이",tag:"아들",meaning:"푸르른 나무처럼 곧게 자라길 바라는 태명",blessing:"푸른 나무처럼 곧고 건강하게 자라나렴."},
+  {name:"별동이",tag:"아들",meaning:"밤하늘의 별처럼 빛나는 존재라는 뜻",blessing:"어둠 속에서도 스스로 빛나는 사람이 되렴."},
+  {name:"예쁜이",tag:"딸",meaning:"고운 마음과 모습을 바라는 태명",blessing:"겉과 속이 모두 고운 사람으로 자라나렴."},
+  {name:"봄이",tag:"딸",meaning:"따스한 봄처럼 포근한 존재라는 뜻",blessing:"네가 머무는 곳마다 봄처럼 따뜻해지길."},
+  {name:"다솜이",tag:"딸",meaning:"사랑을 뜻하는 옛 순우리말",blessing:"사랑을 듬뿍 받고, 또 듬뿍 나누며 살아가렴."},
+  {name:"고운이",tag:"딸",meaning:"마음씨가 곱고 아름답길 바라는 태명",blessing:"말과 행동이 모두 고운 사람으로 자라나렴."},
+  {name:"소망이",tag:"딸",meaning:"가족의 소중한 소망이라는 뜻",blessing:"네가 품은 모든 소망이 이루어지는 삶이 되길."},
+  {name:"나비",tag:"딸",meaning:"훨훨 자유롭게 날아오르길 바라는 태명",blessing:"나비처럼 가볍고 자유롭게 세상을 누비렴."},
+  {name:"꽃님이",tag:"딸",meaning:"꽃처럼 아름답게 피어나길 바라는 태명",blessing:"너만의 색으로 아름답게 피어나는 삶이 되길."},
+  {name:"빛나리",tag:"공용",meaning:"스스로 빛나는 존재가 되길 바라는 태명",blessing:"누가 알아주지 않아도 스스로 빛나는 사람이 되렴."},
+  {name:"든해",tag:"공용",meaning:"든든한 해처럼 존재감 있는 삶을 바라는 태명",blessing:"해처럼 따뜻하게, 또 든든하게 곁을 지켜주렴."},
+  {name:"지음이",tag:"공용",meaning:"정성으로 지어낸 소중한 존재라는 뜻",blessing:"정성껏 지은 이름처럼 정성스러운 삶을 살아가렴."},
+  {name:"여울이",tag:"공용",meaning:"잔잔하지만 힘 있게 흐르는 물처럼 살길 바라는 태명",blessing:"잔잔하면서도 꾸준한 힘으로 나아가는 삶이 되길."},
+  {name:"단비",tag:"딸",meaning:"가뭄 끝에 내리는 반가운 비, 귀한 존재라는 뜻",blessing:"메마른 곳에 생기를 주는 귀한 사람이 되렴."},
+  {name:"산들이",tag:"공용",meaning:"산들바람처럼 편안함을 주는 존재라는 뜻",blessing:"곁에 있는 것만으로 편안함을 주는 사람이 되길."},
+  {name:"가온이",tag:"공용",meaning:"가운데, 중심이라는 뜻의 순우리말",blessing:"흔들림 없이 중심을 잡는 삶을 살아가렴."},
+  {name:"누리",tag:"공용",meaning:"세상을 뜻하는 순우리말",blessing:"온 세상을 품는 넓은 마음을 갖길."},
+  {name:"한올이",tag:"공용",meaning:"하나뿐인 귀한 존재라는 뜻",blessing:"세상에 하나뿐인 너의 색깔로 살아가렴."},
+  {name:"슬기",tag:"딸",meaning:"지혜롭게 자라길 바라는 순우리말 태명",blessing:"어떤 상황에서도 슬기롭게 헤쳐나가는 사람이 되렴."},
+  {name:"든율이",tag:"아들",meaning:"든든하고 규율 있는 삶을 바라는 태명",blessing:"자유로우면서도 스스로를 다스릴 줄 아는 사람이 되렴."},
+  {name:"새힘이",tag:"공용",meaning:"새로운 힘, 활력을 상징하는 태명",blessing:"지치지 않는 새 힘으로 매일을 살아가렴."},
+  {name:"온새미로",tag:"공용",meaning:"언제나 변함없이라는 뜻의 순우리말",blessing:"변함없는 마음으로 오래도록 사랑받는 사람이 되길."},
+  {name:"여명이",tag:"공용",meaning:"새벽의 첫 빛, 새로운 시작을 의미",blessing:"언제나 새로운 시작을 두려워하지 않는 사람이 되렴."},
+  {name:"든보라",tag:"딸",meaning:"든든함과 고귀함을 함께 담은 태명",blessing:"고귀하면서도 든든한 존재로 자라나렴."},
+  {name:"여울아",tag:"공용",meaning:"잔잔한 물결처럼 순리대로 흐르는 삶을 뜻함",blessing:"억지 부리지 않고도 자기 길을 찾아가는 사람이 되렴."},
+  {name:"믿음이",tag:"공용",meaning:"신뢰받는 사람으로 자라길 바라는 태명",blessing:"누구에게나 믿음을 주는 사람으로 자라나렴."},
+  {name:"다솔이",tag:"공용",meaning:"소나무처럼 사계절 푸르길 바라는 태명",blessing:"변치 않는 푸르름으로 오래도록 곁을 지키렴."},
+  {name:"은결이",tag:"딸",meaning:"은빛으로 빛나는 결, 고운 마음결을 뜻함",blessing:"은은하지만 분명하게 빛나는 사람이 되길."},
+  {name:"하람이",tag:"아들",meaning:"하늘이 내린 사람이라는 뜻",blessing:"하늘이 주신 재능을 세상에 아낌없이 나누렴."},
+  {name:"다율이",tag:"공용",meaning:"모든 것에 감사하고 다 이루라는 뜻",blessing:"작은 것에도 감사할 줄 아는 넉넉한 사람이 되렴."},
+  {name:"이슬이",tag:"딸",meaning:"맑고 영롱한 아침 이슬 같은 존재라는 뜻",blessing:"언제나 맑고 순수한 마음을 간직하며 살아가렴."},
+  {name:"단단이",tag:"아들",meaning:"무엇에도 흔들리지 않는 단단함을 바라는 태명",blessing:"어떤 시련에도 부러지지 않는 단단한 사람이 되렴."},
+  {name:"온결이",tag:"공용",meaning:"온전하고 고운 결을 지니라는 뜻",blessing:"겉과 속이 한결같이 고운 사람으로 자라나렴."},
+  {name:"가득이",tag:"공용",meaning:"행복과 사랑이 가득하길 바라는 태명",blessing:"네 삶이 사랑과 행복으로 가득 채워지길."},
+  {name:"여명주",tag:"딸",meaning:"새벽빛처럼 은은하고 귀한 존재라는 뜻",blessing:"은은하지만 결코 흐려지지 않는 빛이 되렴."},
+  {name:"다훈이",tag:"아들",meaning:"따뜻한 가르침을 나누는 사람이 되길 바라는 태명",blessing:"지혜와 따뜻함을 함께 나누는 사람이 되렴."},
+  {name:"보람이",tag:"공용",meaning:"삶에 보람을 느끼며 살길 바라는 태명",blessing:"무엇을 하든 스스로 보람을 찾는 삶이 되길."},
+  {name:"다연이",tag:"딸",meaning:"곱고 부드러운 인연을 뜻하는 태명",blessing:"좋은 인연을 알아보고 소중히 여기는 사람이 되렴."},
+  {name:"든지호",tag:"아들",meaning:"든든하고 호탕한 기상을 바라는 태명",blessing:"큰 그릇으로 세상을 품는 사람이 되렴."},
+  {name:"미소",tag:"딸",meaning:"보는 이를 편안하게 하는 웃음을 뜻함",blessing:"네 미소 하나로 주변을 따뜻하게 만드는 사람이 되렴."},
+  {name:"다올이",tag:"공용",meaning:"좋은 것이 다 온다는 뜻의 순우리말",blessing:"구하지 않아도 좋은 일들이 너를 찾아오길."},
+  {name:"초롱이",tag:"딸",meaning:"초롱불처럼 맑고 밝은 존재라는 뜻",blessing:"어두운 곳에서도 밝음을 잃지 않는 사람이 되렴."},
+  {name:"다진이",tag:"공용",meaning:"참되고 진실된 삶을 바라는 태명",blessing:"언제나 진실됨을 잃지 않는 사람으로 자라나렴."},
+  {name:"든영이",tag:"공용",meaning:"영원히 든든하길 바라는 마음을 담은 태명",blessing:"시간이 지나도 변치 않는 든든함을 지니렴."},
+  {name:"해온이",tag:"공용",meaning:"해처럼 따뜻함이 온다는 뜻",blessing:"네가 가는 곳마다 따뜻한 기운이 함께하길."},
+  {name:"다율아",tag:"딸",meaning:"다정하고 조화로운 삶을 바라는 태명",blessing:"주변과 조화를 이루며 다정하게 살아가렴."},
+  {name:"든하람",tag:"아들",meaning:"하늘이 내린 든든한 존재라는 뜻",blessing:"하늘이 주신 복을 든든하게 지켜나가렴."},
+  {name:"은하",tag:"딸",meaning:"은하수처럼 크고 아름다운 꿈을 담은 태명",blessing:"은하수처럼 크고 반짝이는 꿈을 품고 살아가렴."},
+  {name:"다무리",tag:"공용",meaning:"모든 일을 잘 마무리 짓는 사람이라는 뜻",blessing:"시작한 일을 끝까지 책임지는 사람이 되렴."},
+  {name:"단결이",tag:"아들",meaning:"여럿을 하나로 모으는 힘을 뜻함",blessing:"사람들의 마음을 하나로 모으는 사람이 되렴."},
+  {name:"다예",tag:"딸",meaning:"예쁘고 다정한 마음을 담은 태명",blessing:"다정한 마음으로 주변을 살피는 사람이 되렴."},
+  {name:"새록이",tag:"공용",meaning:"새롭고 신선한 기운을 뜻하는 태명",blessing:"언제나 새로움을 두려워하지 않는 사람이 되렴."},
+  {name:"든하늘",tag:"공용",meaning:"든든하고 넓은 하늘 같은 마음을 뜻함",blessing:"넓고 든든한 마음으로 사람들을 품는 삶이 되길."},
+  {name:"고은이",tag:"딸",meaning:"곱고 은은한 매력을 지니라는 뜻",blessing:"화려하지 않아도 은은하게 빛나는 사람이 되렴."},
+  {name:"다현이",tag:"공용",meaning:"지혜롭고 현명한 삶을 바라는 태명",blessing:"지혜롭게 판단하고 현명하게 살아가는 사람이 되렴."},
+  {name:"든새롬",tag:"공용",meaning:"든든하면서도 늘 새로운 존재라는 뜻",blessing:"안정 속에서도 늘 새로움을 찾는 사람이 되렴."},
+  {name:"라윤이",tag:"딸",meaning:"즐겁고 윤택한 삶을 바라는 태명",blessing:"풍요롭고 즐거운 나날들로 채워지길."},
+  {name:"든민이",tag:"아들",meaning:"든든하고 백성을 아끼는 마음을 뜻함",blessing:"주변을 살피고 아끼는 마음 넓은 사람이 되렴."},
+  {name:"예온이",tag:"딸",meaning:"예의 바르고 따뜻한 성품을 바라는 태명",blessing:"예의와 따뜻함을 함께 갖춘 사람이 되렴."},
+  {name:"다온누리",tag:"공용",meaning:"온 세상에 좋은 것이 다 오길 바라는 태명",blessing:"온 세상 좋은 기운이 너에게 모이길."},
+  {name:"든하율",tag:"공용",meaning:"든든하고 하늘의 이치를 따르는 삶을 뜻함",blessing:"순리를 따르면서도 흔들림 없는 삶이 되길."}
+];
+
+let gender = "모름";
+let currentNames = [];
+let unlocked = false;
+let dadSurnameVal = "", momSurnameVal = "";
+
+document.getElementById('genderBtns').addEventListener('click', (e) => {
+  if(e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#genderBtns button').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  gender = e.target.dataset.g;
+});
+
+document.getElementById('generateBtn').addEventListener('click', () => {
+  const dad = document.getElementById('dadSurname').value.trim();
+  const mom = document.getElementById('momSurname').value.trim();
+  const due = document.getElementById('dueDate').value;
+  const errorEl = document.getElementById('errorText');
+  if(!dad){ errorEl.style.display='block'; errorEl.textContent='아빠 성을 입력해주세요.'; return; }
+  errorEl.style.display='none';
+  dadSurnameVal = dad; momSurnameVal = mom;
+
+  const alreadyUsedFree = localStorage.getItem('taemyeongdang_free_used') === '1';
+  unlocked = false;
+
+  const btn = document.getElementById('generateBtn');
+  const label = document.getElementById('btnLabel');
+  btn.disabled = true; label.textContent = '태명을 짓는 중...';
+  document.getElementById('resultsSection').style.display = 'none';
+
+  const pool = gender==="아들" ? NAME_BANK.filter(n=>n.tag!=="딸") : gender==="딸" ? NAME_BANK.filter(n=>n.tag!=="아들") : NAME_BANK;
+  const seedStr = dad+mom+due+gender;
+  let seed = 0;
+  for(let i=0;i<seedStr.length;i++) seed = (seed*31 + seedStr.charCodeAt(i)) % 100000;
+  const start = seed % pool.length;
+  const picked = [];
+  for(let i=0;i<4;i++) picked.push(pool[(start+i)%pool.length]);
+
+  setTimeout(() => {
+    currentNames = picked;
+    btn.disabled = false; label.textContent = '태명 받아보기';
+    renderResults(alreadyUsedFree);
+    if(!alreadyUsedFree) localStorage.setItem('taemyeongdang_free_used', '1');
+  }, 1400);
+});
+
+function renderResults(alreadyUsedFree){
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('resultsLabel').textContent = `${dadSurnameVal}·${momSurnameVal||""} 아기를 위한 태명`;
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '';
+
+  if(alreadyUsedFree && !unlocked){
+    const notice = document.createElement('p');
+    notice.style.cssText = 'font-size:13px; color:var(--text-mute); margin-bottom:16px;';
+    notice.textContent = '이 브라우저에서는 무료 체험을 이미 사용하셨어요. 계속 다른 태명을 받아보시려면 결제가 필요해요.';
+    container.appendChild(notice);
+  }
+
+  const showCount = unlocked ? currentNames.length : (alreadyUsedFree ? 0 : 1);
+  currentNames.slice(0, showCount).forEach((n, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.animationDelay = (i*0.1)+'s';
+    div.innerHTML = `
+      <div class="card-top"><p class="name serif">${n.name}</p><div class="seal-badge">作</div></div>
+      <p class="meaning">${n.meaning}</p>
+      <p class="blessing">${n.blessing}</p>
+      <button class="save-btn" data-idx="${i}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        태명 증서 카드 저장
+      </button>`;
+    container.appendChild(div);
+  });
+  container.querySelectorAll('.save-btn').forEach(b => {
+    b.addEventListener('click', () => downloadCard(currentNames[unlocked?parseInt(b.dataset.idx):0]));
+  });
+  document.getElementById('unlockBtn').style.display = unlocked ? 'none' : 'block';
+  document.getElementById('unlockSub').style.display = unlocked ? 'none' : 'block';
+  document.getElementById('teaserWrap').style.display = unlocked ? 'none' : 'block';
+  if(!unlocked){
+    document.getElementById('teaserWrap').innerHTML = `
+      <div class="teaser-card"><p class="name serif">○○이</p><p class="meaning">・・・・・・・・・・・・・・・・</p></div>
+      <div class="teaser-lock">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        선택된 3개의 태명이 더 있어요
+      </div>`;
+  }
+}
+
+document.getElementById('unlockBtn').addEventListener('click', () => {
+  unlocked = true;
+  renderResults();
+});
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '', curY = y;
+  for(let i=0;i<words.length;i++){
+    const test = line + words[i] + ' ';
+    if(ctx.measureText(test).width > maxWidth && line !== ''){
+      ctx.fillText(line.trim(), x, curY); line = words[i]+' '; curY += lineHeight;
+    } else { line = test; }
+  }
+  ctx.fillText(line.trim(), x, curY);
+}
+
+function drawCertificate(canvas, entry){
+  const ctx = canvas.getContext('2d');
+  const W=1080, H=1350; canvas.width=W; canvas.height=H;
+  ctx.fillStyle = '#121214'; ctx.fillRect(0,0,W,H);
+  const grad = ctx.createRadialGradient(W/2,H/2,200,W/2,H/2,900);
+  grad.addColorStop(0,'rgba(176,141,87,0.06)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = GOLD; ctx.lineWidth=2; ctx.strokeRect(48,48,W-96,H-96);
+  ctx.lineWidth=1; ctx.strokeRect(64,64,W-128,H-128);
+  const cl=28; ctx.lineWidth=3;
+  [[64,64,1,1],[W-64,64,-1,1],[64,H-64,1,-1],[W-64,H-64,-1,-1]].forEach(([x,y,dx,dy])=>{
+    ctx.beginPath(); ctx.moveTo(x,y+cl*dy); ctx.lineTo(x,y); ctx.lineTo(x+cl*dx,y); ctx.stroke();
+  });
+  ctx.textAlign='center';
+  ctx.fillStyle=GOLD; ctx.font="28px 'Noto Sans KR', sans-serif"; ctx.fillText('태 명 증 서', W/2, 190);
+  ctx.strokeStyle=HAIRLINE; ctx.beginPath(); ctx.moveTo(W/2-80,220); ctx.lineTo(W/2+80,220); ctx.stroke();
+  ctx.fillStyle=TEXT_MUTE; ctx.font="26px 'Noto Sans KR', sans-serif";
+  ctx.fillText(`${dadSurnameVal}·${momSurnameVal||''} 가족의 아기에게`, W/2, 290);
+  ctx.fillStyle=TEXT_MAIN; ctx.font="bold 120px 'Noto Serif KR', serif"; ctx.fillText(entry.name, W/2, 460);
+  ctx.strokeStyle=GOLD; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(W/2-140,500); ctx.lineTo(W/2+140,500); ctx.stroke();
+  ctx.fillStyle=TEXT_MUTE; ctx.font="30px 'Noto Sans KR', sans-serif"; wrapText(ctx, entry.meaning, W/2, 580, 780, 44);
+  ctx.fillStyle=GOLD_BRIGHT; ctx.font="italic 30px 'Noto Serif KR', serif"; wrapText(ctx, entry.blessing, W/2, 760, 780, 46);
+  const sx=W-220, sy=H-260, sr=70;
+  ctx.save(); ctx.translate(sx,sy); ctx.rotate(-0.12);
+  ctx.strokeStyle=SEAL_RED; ctx.lineWidth=4; ctx.strokeRect(-sr,-sr,sr*2,sr*2);
+  ctx.fillStyle=SEAL_RED; ctx.font="bold 34px 'Noto Serif KR', serif"; ctx.textAlign='center';
+  ctx.fillText('胎',0,-8); ctx.font="bold 26px 'Noto Serif KR', serif"; ctx.fillText('名',0,30);
+  ctx.restore();
+  ctx.fillStyle=TEXT_MUTE; ctx.font="22px 'Noto Sans KR', sans-serif"; ctx.textAlign='left';
+  const today = new Date();
+  ctx.fillText(`태명당  ·  ${today.getFullYear()}. ${today.getMonth()+1}. ${today.getDate()}`, 96, H-100);
+}
+
+function downloadCard(entry){
+  const canvas = document.getElementById('hiddenCanvas');
+  drawCertificate(canvas, entry);
+  const dataUrl = canvas.toDataURL('image/png');
+  try{
+    const link = document.createElement('a');
+    link.download = `태명당_${entry.name}.png`; link.href = dataUrl;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }catch(e){}
+  document.getElementById('modalImg').src = dataUrl;
+  document.getElementById('modal').classList.add('show');
+}
+document.getElementById('closeModal').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('show');
+});
+</script>
+</body>
+</html>
