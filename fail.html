@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>결제 실패 — 태명당</title>
+<style>
+  body{margin:0; background:#0D0E10; color:#EDEAE2; font-family:'Noto Sans KR',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;}
+  .box{max-width:420px;}
+  h1{font-family:'Noto Serif KR',serif; font-size:28px; color:#C0705A; margin-bottom:16px;}
+  p{font-size:14px; color:#8A8A85; line-height:1.7;}
+  a{display:inline-block; margin-top:24px; padding:14px 28px; background:#B08D57; color:#0D0E10; text-decoration:none; font-weight:bold; border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>결제가 완료되지 않았어요</h1>
+  <p id="msg">다시 시도해주세요.</p>
+  <a href="/">메인으로 돌아가기</a>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const message = params.get('message');
+  if (message) document.getElementById('msg').innerText = decodeURIComponent(message);
+</script>
+</body>
+</html>
