@@ -164,10 +164,15 @@
   <footer style="max-width:640px; margin:40px auto 0; padding:24px 24px 60px; border-top:1px solid #2B2C30; font-size:11px; line-height:1.9; color:#6b6b68;">
     <div>상호: 요다 &nbsp;|&nbsp; 대표자: 이정섭 &nbsp;|&nbsp; 사업자등록번호: 486-12-02452</div>
     <div>사업장 주소: 경기도 남양주시 진접읍 해밀예당1로 83, 116동 403호</div>
+    <div>통신판매업 신고번호: 2026-진접오남-0491</div>
     <div>이메일: ljs4548@gmail.com</div>
     <div style="margin-top:8px;">© 2026 태명당(요다). All rights reserved.</div>
   </footer>
+<script src="https://js.tosspayments.com/v1/payment"></script>
 <script>
+const TOSS_CLIENT_KEY = "test_gck_kYG57Eba3GKOzzDak7D63pWDOxmA";
+const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+
 const GOLD="#B08D57", GOLD_BRIGHT="#D4AF6A", INK="#0D0E10", PANEL="#17181B", HAIRLINE="#2B2C30", TEXT_MAIN="#EDEAE2", TEXT_MUTE="#8A8A85", SEAL_RED="#8C2F2F";
 
 const NAME_BANK = [
@@ -340,8 +345,17 @@ function renderResults(alreadyUsedFree){
 }
 
 document.getElementById('unlockBtn').addEventListener('click', () => {
-  unlocked = true;
-  renderResults();
+  const orderId = 'taemyeong_' + Date.now();
+  sessionStorage.setItem('tmd_pending_order', JSON.stringify({
+    orderId, dadSurname: dadSurnameVal, momSurname: momSurnameVal, gender, dueDate: document.getElementById('dueDate').value
+  }));
+  tossPayments.requestPayment('카드', {
+    amount: 9900,
+    orderId: orderId,
+    orderName: '태명당 VIP 태명 전체 공개',
+    successUrl: window.location.origin + '/success.html',
+    failUrl: window.location.origin + '/fail.html',
+  });
 });
 
 function wrapText(ctx, text, x, y, maxWidth, lineHeight){
@@ -407,4 +421,3 @@ document.getElementById('closeModal').addEventListener('click', () => {
 </script>
 </body>
 </html>
-
